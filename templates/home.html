@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<button id="odds">Odds Test</button>
+  <!-- <ul class="list-group list-group-flush" id="sportsList">
+    
+  </ul> -->
+
+  <ul class="list-group list-group-item-action list-group-flush" id="sportsList">
+    {% for sport in sports %}
+    <li class="list-group-item"><a href="#">{{sport.upper()}}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

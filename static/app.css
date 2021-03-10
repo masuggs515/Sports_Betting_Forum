@@ -1,0 +1,8 @@
+#sportsList ul{
+    list-style: none;
+    
+}
+
+#sportsList a{
+    text-decoration: none;
+}
