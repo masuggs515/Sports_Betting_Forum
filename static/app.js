@@ -1,22 +1,22 @@
 const BASE_URL = 'https://api.the-odds-api.com/'
 const API_KEY = '0fdc02bed86bc36fe82801e9ef8b7a2e'
+const COMMENT_URL = '/'
 
-
-
-async function allOdds(){
-    let res = await axios.get(`${BASE_URL}v3/odds/`, {params: 
-        {apiKey: API_KEY,
-        sport: 'upcoming',
-        region: 'us'}})
-        console.log(res.data.data)
-    const games = res.data.data;
-    for(let game in games){
-        const gameTeams = games[game].teams;
-        const homeTeam = games[game].home_team;
-        console.log(gameTeams)
-        console.log(homeTeam)
-
-    }
+async function processCommentForm(e) {
+    e.preventDefault();
+  
+    let text = $("#Comment").val();
+    
+    const commentData = await axios.post(COMMENT_URL, {
+      text
+    });
+    
+    handleResponse(commentData)
 }
 
-$('#odds').on('click', allOdds)
+function handleCommentResponse(commentData){
+
+}
+
+
+// $('comment_form').on('submit', processCommentForm)

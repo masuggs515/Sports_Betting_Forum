@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Join SportDiscuss{% endblock %}
+
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-md-7 col-lg-5">
+      <h2 class="join-message mt-3 text-center">Join Discuss Today</h2>
+      <form method="POST" id="user_form">
+        {{ form.hidden_tag() }}
+  
+        {% for field in form if field.widget.input_type != 'hidden' %}
+        {% for error in field.errors %}
+        <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+        {{field.label}}
+        {{ field(placeholder=field.label.text, class="my-2 form-control") }}
+        {% endfor %}
+        <p class="text-cente">Already have an account? Log in <a class="text-primary" href="/login">here.</a></p>
+        
+        <button class="btn btn-dark btn-block">Sign me up!</button>
+      </form>
+    </div>
+  </div>
+
+  {% endblock %}

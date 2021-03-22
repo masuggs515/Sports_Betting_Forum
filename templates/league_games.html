@@ -1,0 +1,24 @@
+{%extends 'base.html'%}
+{% block title %}{{league_games.data[0].sport_nice}} Games{% endblock %}
+{% block content %}
+<h1 class="mt-3 text-center text-white">All Games In {{league_games.data[0].sport_nice}}</h1>
+<div class="container">
+    <div class="row d-flex justify-content-end">
+        {% for game in league_games.data %}
+        <div class="col-4 m-auto">
+            <div class="m-2">
+
+                <a href="/game/{{game.id}}" class="p-3 bg-dark text-white text-decoration-none d-flex justify-content-center align-items-center flex-column">
+                    <div class="text-center">{{game.teams[0]}}</div>
+                    <div>vs.</div>
+                    <div class="text-center">{{game.teams[1]}}</div>
+
+                </a>
+            </div>
+        </div>
+
+
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
