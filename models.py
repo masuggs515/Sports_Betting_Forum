@@ -26,7 +26,8 @@ class User(db.Model):
                     nullable=False,
                     unique=True)
     password = db.Column(db.Text, nullable=False)
-    image_url = db.Column(db.Text)
+    image_url = db.Column(db.Text,
+                            default='https://icon-library.com/images/default-profile-icon/default-profile-icon-16.jpg')
 
     @classmethod
     def signup(cls, username, password):
@@ -61,7 +62,7 @@ class User(db.Model):
 
         return False
 
-    comment = db.relationship("Comment")
+    comment = db.relationship("Comment",cascade="all, delete-orphan", backref="user")
 
 # Save game information
 
@@ -81,7 +82,7 @@ class Game(db.Model):
 
     team_two_odds = db.Column(db.Text)
 
-    comment = db.relationship("Comment")
+    comment = db.relationship("Comment", cascade="all, delete-orphan", backref='game')
 
 # Comments for game
 

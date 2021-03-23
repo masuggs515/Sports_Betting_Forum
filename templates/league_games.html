@@ -4,7 +4,10 @@
 <h1 class="mt-3 text-center text-white">All Games In {{league_games.data[0].sport_nice}}</h1>
 <div class="container">
     <div class="row d-flex justify-content-end">
-        {% for game in league_games.data %}
+        <h3>Live Games</h3>
+        {% for game in league_games.data if game.commence_time < game.sites[0].last_update %}
+        {% if game %}
+        
         <div class="col-4 m-auto">
             <div class="m-2">
 
@@ -16,8 +19,25 @@
                 </a>
             </div>
         </div>
+        {% else %}
+        <h4>No current live games</h4>
+        {% endif %}
+        {% endfor %}
+        <h3>Upcoming Games</h3>
 
+        {% for game in league_games.data if game.commence_time > game.sites[0].last_update %}
 
+        <div class="col-4 m-auto">
+            <div class="m-2">
+
+                <a href="/game/{{game.id}}" class="p-3 bg-dark text-white text-decoration-none d-flex justify-content-center align-items-center flex-column">
+                    <div class="text-center">{{game.teams[0]}}</div>
+                    <div>vs.</div>
+                    <div class="text-center">{{game.teams[1]}}</div>
+
+                </a>
+            </div>
+        </div>
         {% endfor %}
     </div>
 </div>

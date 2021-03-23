@@ -110,12 +110,29 @@ def logout():
     """Handle logout of user."""
     return redirect('/login')
 
-@app.route('/user/<user_id>', methods=["GET", "POST"])
+@app.route('/')
+def home_page():
+    if CURR_USER_KEY in session:
+        return redirect('/leagues')
+    
+    return redirect('/signup')
+
+# User page
+
+@app.route('/user/<user_id>')
+def user_details(user_id):
+    user = User.query.get_or_404(user_id)
+    comments = (Comment.query.filter(Comment.user_id==user.id)
+                                    .order_by(Comment.timestamp.desc())
+                                    .all())
+    return render_template('user_details.html', user=user, comments=comments)
+
+@app.route('/user/<user_id>/edit', methods=["GET", "POST"])
 def edit_profile(user_id):
     form = EditUserForm()
     curr_user = User.query.get_or_404(user_id)
     if curr_user.id != g.user.id:
-        flash('You can only edit your profile.', 'danger')
+        flash('You can only edit your own profile.', 'danger')
         return redirect('/leagues')
     if form.validate_on_submit():
         user = User.authenticate(form.username.data,
@@ -133,13 +150,18 @@ def edit_profile(user_id):
     else:
         return render_template('edit_user.html', form=form, user=curr_user)
     
+@app.route('/user/<user_id>/delete')
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == g.user.id:
+        do_logout()
+        db.session.delete(user)
+        db.session.commit()
+        return redirect('/signup')
+    else:
+        flash("You cannot delete another user, here's your profile to edit!", "danger")
+        return redirect(f'/user/{user.id}')
 
-@app.route('/')
-def home_page():
-    if CURR_USER_KEY in session:
-        return redirect('/leagues')
-    
-    return redirect('/signup')
 
 # Leagues and games/spreads
 
@@ -189,6 +211,18 @@ def game_data_comments(game_id):
 
     game = Game.query.get_or_404(game_id)
     return render_template('game.html', game=game, form=form, comments=comments)
+
+@app.route('/comment/<comment_id>/delete', methods=["POST"])
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    game_id = comment.game.id
+    if comment.user.id == g.user.id:
+        db.session.delete(comment)
+        db.session.commit()
+        return redirect(f'/game/{game_id}')
+    else:
+        flash("You can't delete someone else's comment", "danger")
+        return redirect(f'/game/{game_id}')
 
 
 def database_add_games(league_data):
