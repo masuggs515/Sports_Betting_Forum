@@ -27,7 +27,7 @@ class User(db.Model):
                     unique=True)
     password = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.Text,
-                            default='https://icon-library.com/images/default-profile-icon/default-profile-icon-16.jpg')
+                            default='https://t3.ftcdn.net/jpg/00/64/67/80/360_F_64678017_zUpiZFjj04cnLri7oADnyMH0XBYyQghG.jpg')
 
     @classmethod
     def signup(cls, username, password):
@@ -63,6 +63,7 @@ class User(db.Model):
         return False
 
     comment = db.relationship("Comment",cascade="all, delete-orphan", backref="user")
+    like = db.relationship("Like", cascade="all, delete-orphan", backref="user")
 
 # Save game information
 
@@ -110,4 +111,20 @@ class Comment(db.Model):
                     nullable=False,
                     default=datetime.now)
 
+    like = db.relationship("Like", cascade="all, delete-orphan", backref="comment")
+
     
+class Like(db.Model):
+    """likes table"""
+
+    __tablename__ = "likes"
+
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.id", ondelete='cascade'),
+                        primary_key=True,
+                        nullable=False)
+
+    comment_id = db.Column(db.Integer,
+                        db.ForeignKey("comments.id", ondelete='cascade'),
+                        primary_key=True,
+                        nullable=False)

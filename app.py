@@ -1,9 +1,10 @@
-from flask import Flask, g, render_template, redirect, session, flash
+from flask import Flask, g, render_template, redirect, session, flash, request
 from sqlalchemy.exc import IntegrityError
 import requests
 import json
-from models import db, connect_db, User, Game, Comment
+from models import db, connect_db, User, Game, Comment, Like
 from secret import API_KEY
+from functions import add_comment, database_add_games
 from forms import RegisterUserForm, LoginUserForm, CommentForm, EditUserForm
 
 
@@ -140,7 +141,6 @@ def edit_profile(user_id):
         if user:
             curr_user.username = form.username.data
             curr_user.image_url = form.image_url.data
-            db.session.add(curr_user)
             db.session.commit()
         else:
             flash('Incorrect username or password', 'danger')
@@ -180,14 +180,17 @@ def all_games_in_sport(league):
     league_res = requests.get(f' https://api.the-odds-api.com/v3/odds/?apiKey={API_KEY}&sport={league}&region=us&mkt=spreads')
     league_games = json.loads(league_res.text)
 
-    database_add_games(league_games)
-        
+
+    j = database_add_games(league_games)
+    if j == 'FAILED NO BETS':
+        return redirect('/leagues')
 
     return render_template('league_games.html', league_games=league_games, league=league)
 
 @app.route('/game/<game_id>', methods=["GET", "POST"])
 def game_data_comments(game_id):
     form = CommentForm()
+    
     comments= (Comment
                 .query
                 .filter(Comment.game_id==game_id)
@@ -195,52 +198,43 @@ def game_data_comments(game_id):
                 .limit(20)
                 .all())
 
-    if form.validate_on_submit():
+    if request.method == "POST":
         if not g.user:
-            flash("You must be logged in to leave a comment.", "danger")
-            return redirect(f'/game/{game_id}')
-        text = form.text.data
-        user_id = g.user.id
+            return ({"error": "You must be logged in to leave a comment."}, 200)
+        text = request.json["text"]
         game_id = game_id
-        comment = Comment(text=text, user_id=user_id, game_id=game_id)
-        db.session.add(comment)
-        db.session.commit()
-        
-        return redirect(f'/game/{game_id}')
+        return (add_comment(text, game_id), 200)
+    else:
+        game = Game.query.get_or_404(game_id)
+        return render_template('game.html', game=game, form=form, comments=comments)
 
-
-    game = Game.query.get_or_404(game_id)
-    return render_template('game.html', game=game, form=form, comments=comments)
-
-@app.route('/comment/<comment_id>/delete', methods=["POST"])
+@app.route('/comment/<comment_id>/delete', methods=["DELETE"])
 def delete_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
-    game_id = comment.game.id
-    if comment.user.id == g.user.id:
-        db.session.delete(comment)
-        db.session.commit()
-        return redirect(f'/game/{game_id}')
-    else:
-        flash("You can't delete someone else's comment", "danger")
-        return redirect(f'/game/{game_id}')
+    db.session.delete(comment)
+    db.session.commit()
+    return ({"success"})
 
 
-def database_add_games(league_data):
-    old_games = Game.query.all()
+
+# Likes
+
+@app.route('/comment/add_like', methods=["POST"])
+def add_like():
+    comment_id = request.json["comment_id"]
     
-    for game in league_data["data"]:
-        games_in_db = Game.query.get(game["id"])
-        if games_in_db:
-            games_in_db.team_one_odds = game["sites"][0]["odds"]["spreads"]["points"][0]
-            games_in_db.team_two_odds = game["sites"][0]["odds"]["spreads"]["points"][1]
-        else:
-            team_one_odds = game["sites"][0]["odds"]["spreads"]["points"][0]
-            team_two_odds = game["sites"][0]["odds"]["spreads"]["points"][1]
-            id = game["id"]
-            team_one = game["teams"][0]
-            team_two = game["teams"][1]
-            game = Game(id=id, team_one=team_one, team_two=team_two, team_one_odds=team_one_odds, team_two_odds=team_two_odds)
-            db.session.add(game)
-        db.session.commit()
-        
-# Comments
+    new_like = Like(comment_id=comment_id, user_id=g.user.id)
+    db.session.add(new_like)
+    db.session.commit()
+    return ({"success":{"added_like": comment_id}})
+
+
+@app.route('/comment/remove_like', methods=["POST"])
+def remove_like():
+    comment_id = request.json["comment_id"]
+    like_id_obj = Like.query.filter(Like.comment_id==comment_id, Like.user_id==g.user.id).one()
+    like_id = like_id_obj.user_id
+    like = Like.query.get_or_404((like_id, comment_id))
+    db.session.delete(like)
+    db.session.commit()
+    return ({"success":{"removed_like": comment_id}})

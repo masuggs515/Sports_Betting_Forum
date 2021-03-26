@@ -10,7 +10,8 @@ Database is in postgresql and created/updated with flask-sqlalchemy.
 ## Tables in database
 ---
 ### Users
-username (primary key)  
+user_id
+username ()  
 email  
 password
 
@@ -25,6 +26,5 @@ username (foreign key)
 game_id (foreign key) 
 
 ### Likes (users_comments)  
-like_id (primary key)  
-username (foreign key)  
-comment_id (foreign key) 
+user_id (primary key/foreign key)  
+comment_id (primary key/foreign key) 

@@ -17,7 +17,6 @@ class EditUserForm(FlaskForm):
     username = StringField("Username", validators=[InputRequired()])
 
     image_url = StringField("Profile Image URL", 
-                        default='https://icon-library.com/images/default-profile-icon/default-profile-icon-16.jpg',
                         validators=[url()])
 
     password = PasswordField("Password", validators=[InputRequired()])

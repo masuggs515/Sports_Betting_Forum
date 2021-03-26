@@ -2,3 +2,7 @@
 #delete-comment{
     font-size: 0.7rem;
 }
+
+.likes{
+    cursor: pointer;
+}
