@@ -1,18 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}SportDiscuss{% endblock %}
 {% block content %}
-<h2 class="text-white text-center mt-3">All Leagues Available</h2>
-<div class="container">
-  <div class="d-flex align-items-center">
-    <ul class="list-group list-group-flush" id="sportsList">
-      <div class="row d-flex justify-content-center">
-        {% for league in league_data %}
-        {{league.group}}
-        <a class="d-flex text-center bg-dark text-white align-items-center justify-content-center col-5 col-md-3 m-2 list-group-item"
-          href="/leagues/{{league.key}}"><b>{{league.title.upper()}}</b></a>
-        {% endfor %}
-    </ul>
-    </ul>
+
+<body class="bg-leagues">
+
+
+  <h2 class="text-light-grey text-center mt-3">All Leagues Available</h2>
+  <div class="container">
+    <div class="d-flex align-items-center">
+      <ul class="list-group list-group-flush" id="sportsList">
+        <div class="row d-flex justify-content-center">
+          {% for league in league_data %}
+          <a class="d-flex text-center bg-dark-blue text-light-grey border-green-leagues align-items-center justify-content-center col-5 col-md-3 m-2 list-group-item"
+            href="/leagues/{{league.key}}"><b>{{league.title.upper()}}</b></a>
+          {% endfor %}
+      </ul>
+      </ul>
+    </div>
   </div>
-</div>
+</body>
 {% endblock %}

@@ -23,4 +23,4 @@ class EditUserForm(FlaskForm):
 
 class CommentForm(FlaskForm):
 
-    text = TextAreaField("Comment", validators=[InputRequired()])
+    text = TextAreaField("Comment", validators=[InputRequired()]) 

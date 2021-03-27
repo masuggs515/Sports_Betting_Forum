@@ -4,23 +4,42 @@
 
 {% block content %}
 
-  <div class="row justify-content-md-center">
-    <div class="col-md-7 col-lg-5">
-      <h2 class=" mt-3 join-message text-center">Log back in below.</h2>
-      <form method="POST" id="user_form">
-        {{ form.hidden_tag() }}
+<body class="bg-login">
 
-        {% for field in form if field.widget.input_type != 'hidden' %}
+  <div class="row justify-content-md-between align-items-center mt-5 pt-5">
+    <div class="login-card col text-light-grey pb-5">
+      <h1 class="text-center display-2 my-3">Welcome to SportDiscuss</h1>
+      <h2 class="text-center mx-5 mb-5 pb-5">Join the conversation</h2>
+    </div>
+    <div class="col-md-7 col-lg-5 m-3" id="signup-form">
+      <div class="container mt-3 p-3" id="signup-form">
+        <div class="row text-light-grey justify-content-center">
+          <a href="/signup" class="text-decoration-none text-center col-5 pt-2 pb-1 text-light-grey border-green-login">
+            <h5 class="">Register</h5>
+          </a>
+          <a href="/login" class="text-decoration-none text-center col-5 bg-green pt-2 pb-1  text-dark-blue">
+            <h5 class=""> Login</h5>
+          </a>
+        </div>
+        <h2 class="join-message  pt-5 text-center text-light-grey ">Welcome Back</h2>
+        <form method="POST" id="user_form" class="mt-5">
+          {{ form.hidden_tag() }}
+
+          {% for field in form if field.widget.input_type != 'hidden' %}
           {% for error in field.errors %}
-            <span class="text-danger">{{ error }}</span>
+          <span class="text-danger">{{ error }}</span>
           {% endfor %}
-          {{field.label}}
-          {{ field(placeholder=field.label.text, class="my-2 form-control") }}
-        {% endfor %}
-        <p>Don't have an account? Register <a class="text-primary" href="/signup">here.</a></p>
-        <button class="btn btn-dark btn-block">Log in</button>
-      </form>
+          <div class="mb-3">
+            <b class="ms-4">{{field.label(class="text-light-grey")}}</b>
+            {{ field(placeholder=field.label.text, class="my-2 mb-3 form-control bg-light", id="form-input") }}
+          </div>
+          {% endfor %}
+          <div class="justify-content-center mt-5 text-center">
+            <button id="login-register-btn" class="btn bg-green"><b>Log In</b></button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-
+</body>
 {% endblock %}

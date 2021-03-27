@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
 from flask_bcrypt import Bcrypt
 
 db = SQLAlchemy()
@@ -27,7 +26,7 @@ class User(db.Model):
                     unique=True)
     password = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.Text,
-                            default='https://t3.ftcdn.net/jpg/00/64/67/80/360_F_64678017_zUpiZFjj04cnLri7oADnyMH0XBYyQghG.jpg')
+                            default='/static/images/defaultProfileImage.jpg')
 
     @classmethod
     def signup(cls, username, password):
@@ -65,7 +64,7 @@ class User(db.Model):
     comment = db.relationship("Comment",cascade="all, delete-orphan", backref="user")
     like = db.relationship("Like", cascade="all, delete-orphan", backref="user")
 
-# Save game information
+# Save game schema
 
 class Game(db.Model):
     """games"""
@@ -85,7 +84,7 @@ class Game(db.Model):
 
     comment = db.relationship("Comment", cascade="all, delete-orphan", backref='game')
 
-# Comments for game
+# Comments for game schema
 
 class Comment(db.Model):
     """comments table"""
@@ -113,6 +112,7 @@ class Comment(db.Model):
 
     like = db.relationship("Like", cascade="all, delete-orphan", backref="comment")
 
+# Likes schema
     
 class Like(db.Model):
     """likes table"""

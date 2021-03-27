@@ -1,26 +1,31 @@
+# all imports
+
 from flask import Flask, g, render_template, redirect, session, flash, request
 from sqlalchemy.exc import IntegrityError
 import requests
 import json
 from models import db, connect_db, User, Game, Comment, Like
 from secret import API_KEY
-from functions import add_comment, database_add_games
+from functions import add_comment, database_add_games, remove_like_from_comment
 from forms import RegisterUserForm, LoginUserForm, CommentForm, EditUserForm
 
+# Create app and connect to database
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = 'bettinggnitteb'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///sports_forum'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
 connect_db(app)
+
+db.create_all()
+
+# Global variables
 
 res = requests.get(f'https://api.the-odds-api.com/v3/sports/?apiKey={API_KEY}')
 all_leagues = json.loads(res.text)
 
-db.create_all()
-
 CURR_USER_KEY = "curr_user"
+
+# User information
 
 @app.before_request
 def add_user_to_g():
@@ -53,8 +58,7 @@ def signup():
 
     If form not valid, present form.
 
-    If the there already is a user with that username: flash message
-    and re-present form.
+    If username is taken then flash message and re-present form.
     """
     if CURR_USER_KEY in session:
         return redirect('/leagues')
@@ -108,20 +112,19 @@ def logout():
     """Logs out user and removes user from session."""
     do_logout()
     flash('Successfully logged out.', 'success')
-    """Handle logout of user."""
     return redirect('/login')
 
 @app.route('/')
 def home_page():
+    """If user in session show all leagues, if not in session show register/login."""
     if CURR_USER_KEY in session:
         return redirect('/leagues')
     
     return redirect('/signup')
 
-# User page
-
 @app.route('/user/<user_id>')
 def user_details(user_id):
+    """Show user profile page."""
     user = User.query.get_or_404(user_id)
     comments = (Comment.query.filter(Comment.user_id==user.id)
                                     .order_by(Comment.timestamp.desc())
@@ -130,6 +133,12 @@ def user_details(user_id):
 
 @app.route('/user/<user_id>/edit', methods=["GET", "POST"])
 def edit_profile(user_id):
+    """On submit update user information.
+    
+    If form not validated show edit user form.
+
+    If password incorrect flash message.
+    """
     form = EditUserForm()
     curr_user = User.query.get_or_404(user_id)
     if curr_user.id != g.user.id:
@@ -152,6 +161,10 @@ def edit_profile(user_id):
     
 @app.route('/user/<user_id>/delete')
 def delete_user(user_id):
+    """If user to delete has same id as user in the session then delete user from database and log out user.
+    
+    If user is not user in session flash message and return to user profile page.
+    """
     user = User.query.get_or_404(user_id)
     if user.id == g.user.id:
         do_logout()
@@ -163,11 +176,12 @@ def delete_user(user_id):
         return redirect(f'/user/{user.id}')
 
 
-# Leagues and games/spreads
+# Leagues and games/spreads with bottom being comments
 
 
 @app.route('/leagues')
 def leagues_list():
+    """Show all leagues that have current available betting."""
     if all_leagues["success"]:
         league_data = all_leagues["data"]
         return render_template('leagues.html', league_data=league_data)
@@ -177,9 +191,13 @@ def leagues_list():
 
 @app.route('/leagues/<league>')
 def all_games_in_sport(league):
-    league_res = requests.get(f' https://api.the-odds-api.com/v3/odds/?apiKey={API_KEY}&sport={league}&region=us&mkt=spreads')
-    league_games = json.loads(league_res.text)
+    """
+    Retrieve from API and show all games available in chosen league.
 
+    If league has no betting data then flash message and redirect back to all leagues page.
+    """
+    league_res = requests.get(f'https://api.the-odds-api.com/v3/odds/?apiKey={API_KEY}&sport={league}&region=us&mkt=spreads')
+    league_games = json.loads(league_res.text)
 
     j = database_add_games(league_games)
     if j == 'FAILED NO BETS':
@@ -189,6 +207,11 @@ def all_games_in_sport(league):
 
 @app.route('/game/<game_id>', methods=["GET", "POST"])
 def game_data_comments(game_id):
+    """Show game and spread data for game chosen.
+    
+    On submit of comment add comment to database and return data to JavaScript.
+    
+    if user is not logged in return error message to JavaScript to flash message."""
     form = CommentForm()
     
     comments= (Comment
@@ -210,6 +233,7 @@ def game_data_comments(game_id):
 
 @app.route('/comment/<comment_id>/delete', methods=["DELETE"])
 def delete_comment(comment_id):
+    """Delete comment from db and send response to JavaScript."""
     comment = Comment.query.get_or_404(comment_id)
     db.session.delete(comment)
     db.session.commit()
@@ -221,6 +245,7 @@ def delete_comment(comment_id):
 
 @app.route('/comment/add_like', methods=["POST"])
 def add_like():
+    """Add like to comment."""
     comment_id = request.json["comment_id"]
     
     new_like = Like(comment_id=comment_id, user_id=g.user.id)
@@ -231,10 +256,10 @@ def add_like():
 
 @app.route('/comment/remove_like', methods=["POST"])
 def remove_like():
+    """Remove like from comment."""
     comment_id = request.json["comment_id"]
-    like_id_obj = Like.query.filter(Like.comment_id==comment_id, Like.user_id==g.user.id).one()
-    like_id = like_id_obj.user_id
-    like = Like.query.get_or_404((like_id, comment_id))
+    like = remove_like_from_comment(comment_id)
     db.session.delete(like)
     db.session.commit()
     return ({"success":{"removed_like": comment_id}})
+

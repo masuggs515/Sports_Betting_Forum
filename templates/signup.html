@@ -2,24 +2,45 @@
 {% block title %}Join SportDiscuss{% endblock %}
 
 {% block content %}
-<div class="row justify-content-md-center">
-    <div class="col-md-7 col-lg-5">
-      <h2 class="join-message mt-3 text-center">Join Discuss Today</h2>
-      <form method="POST" id="user_form">
-        {{ form.hidden_tag() }}
-  
-        {% for field in form if field.widget.input_type != 'hidden' %}
-        {% for error in field.errors %}
-        <span class="text-danger">{{ error }}</span>
-        {% endfor %}
-        {{field.label}}
-        {{ field(placeholder=field.label.text, class="my-2 form-control") }}
-        {% endfor %}
-        <p class="text-cente">Already have an account? Log in <a class="text-primary" href="/login">here.</a></p>
-        
-        <button class="btn btn-dark btn-block">Sign me up!</button>
-      </form>
+
+<body class="bg-login">
+
+  <div class="row justify-content-md-between mt-5 pt-5 align-items-center">
+    <div class="login-card col text-light-grey pb-5">
+      <h1 class="text-center display-2 my-3">Welcome to SportDiscuss</h1>
+      <h2 class="text-center mx-5 mb-5 pb-5">Join the conversation</h2>
+    </div>
+    <div class="col-md-7 col-lg-5 m-3" id="signup-form">
+      <div class="container mt-3 p-3" id="signup-form">
+        <div class="row text-light-grey justify-content-center">
+          <a href="/signup" class="text-decoration-none text-center col-5 bg-green pt-2 pb-1  text-dark-blue">
+            <h5 class="">Register</h5>
+          </a>
+          <a href="/login" class="text-decoration-none text-center col-5 pt-2 pb-1 text-light-grey border-green-login">
+            <h5 class=""> Login</h5>
+          </a>
+        </div>
+        <h2 class="join-message mx-4 pt-3 text-center text-light-grey">Join SportDiscuss
+          Today</h2>
+        <form method="POST" id="user_form" class="mt-5">
+          {{ form.hidden_tag() }}
+
+          {% for field in form if field.widget.input_type != 'hidden' %}
+          {% for error in field.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+          <div>
+            <b class="ms-4">{{field.label(class="text-light-grey")}}</b>
+            {{ field(placeholder=field.label.text, class="my-2 mb-3 form-control bg-light", id="form-input") }}
+          </div>
+          {% endfor %}
+          <div class="justify-content-center mt-5 text-center">
+            <button id="login-register-btn" class="btn bg-green "> <b>Sign me
+                up!</b></button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-
-  {% endblock %}
+</body>
+{% endblock %}

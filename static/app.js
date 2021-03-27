@@ -22,12 +22,12 @@ function handleCommentResponse(commentData) {
     const user_image = commentData.data.user_image;
     const comment_id = commentData.data.comment_id;
     let commentHtml = `
-                <div id="${comment_id}" class="bg-dark border border-1 border-white rounded-3 mt-4 px-3 pt-2 text-justify float-left">
+                <div id="${comment_id}" class="bg-dark-blue border-green mt-4 px-3 pt-2 text-justify float-left">
                     <img src=${user_image} alt="" class="rounded-circle" width="35" height="35">
                     <h4 class="d-inline mx-2">${username}</h4>
                     <span class="float-end"><small>${time}</small></span>
-                            <span class="pt-2"><i class="likes d-inline bg-dark text-white float-end far fa-thumbs-up me-2"></i></span>
-                            <button type="submit" id="delete-comment" class="float-end btn btn-sm btn-outline-light me-2">
+                            <span class="pt-2"><i class="likes d-inline bg-dark-blue text-light-grey float-end far fa-thumbs-up me-2"></i></span>
+                            <button type="submit" id="delete-comment" class="float-end btn btn-sm bg-dark-blue text-light-grey border border-light rounded-3 me-2">
                             Delete comment <i class="fa fa-trash"></i></button>
                     <br>
                     <p class="mx-4 mt-2">${comment}</p>

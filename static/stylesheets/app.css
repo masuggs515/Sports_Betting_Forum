@@ -1,3 +1,101 @@
+/* Global Styles */
+
+.nav-shadow{
+    box-shadow: 0 3px 2px -2px #69be28;
+}
+
+input:focus, textarea:focus, button:focus{
+    outline: none;
+}
+
+.text-green, .text-green:hover{
+    color: #69be28;
+}
+
+.bg-dark-grey{
+    background-color: rgb(25, 24, 34);
+}
+
+#form-input{
+    width: 80%;
+    margin: 0 auto;
+}
+
+
+.text-light-grey, .text-light-grey:hover{
+    color: #AAA;
+    text-decoration: none;
+}
+
+.bg-light-grey{
+    background-color: rgba(133, 133, 151, 0.835);
+}
+
+.bg-light-grey:hover{
+    background-color: rgb(133,133,151);
+}
+
+.bg-grey{
+    background-color: rgb(55, 55, 65);
+}
+
+.bg-dark-blue, .bg-dark-blue:focus{
+    background-color: #002;
+}
+
+.text-dark-blue, .text-dark-blue:hover{
+    color: #002;
+    text-decoration: none;
+}
+
+.bg-green{
+    background-color: #69be28;
+}
+
+.border-green{
+    border: 1px solid #69be28;
+    border-radius: 10px;
+}
+
+.border-green-image{
+    border: 2px solid #69be28;
+    border-radius: 10px;
+}
+
+/* Login/Register styles */
+
+#login-register-btn{
+    border-radius: 50px;
+    width: 80%;
+}
+
+#signup-form{
+    height: 60vh;
+}
+
+.bg-login{
+    background-image: url('/static/images/loginBackground.jpg');
+    background-size: 100%;
+    overflow-x: hidden;
+}
+
+.border-green-login{
+    border-bottom: 5px solid #69be28;
+}
+
+/* Leagues Page */
+
+.bg-leagues{
+    background-image: url('/static/images/leaguesBackground.jpg');
+    background-size: 100%;
+    /* background-color: #AAA; */
+}
+.border-green-leagues{
+    border-bottom: 2px solid #69be28;
+
+}
+
+/* Games Page */
 
 #delete-comment{
     font-size: 0.7rem;
@@ -5,4 +103,17 @@
 
 .likes{
     cursor: pointer;
+}
+
+.comment-btn{
+    border-radius: 50px;
+    width: 100%;
+}
+
+.border-game-header{
+    border-bottom: 3px solid #69be28;
+}
+
+.border-game{
+    border: 1px solid #69be28;
 }
