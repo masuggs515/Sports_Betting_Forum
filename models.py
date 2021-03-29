@@ -21,6 +21,9 @@ class User(db.Model):
     id = db.Column(db.Integer,
                     primary_key=True,
                     autoincrement=True)
+    email = db.Column(db.Text,
+                    nullable=False,
+                    unique=True)
     username = db.Column(db.String(20),
                     nullable=False,
                     unique=True)
@@ -29,7 +32,7 @@ class User(db.Model):
                             default='/static/images/defaultProfileImage.jpg')
 
     @classmethod
-    def signup(cls, username, password):
+    def signup(cls, username, password, email):
         """Sign up user.
 
         Hashes password and adds user to system.
@@ -38,6 +41,7 @@ class User(db.Model):
         hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
 
         user = User(
+            email=email,
             username=username,
             password=hashed_pwd
         )

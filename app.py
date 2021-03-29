@@ -1,5 +1,5 @@
 # all imports
-
+import os
 from flask import Flask, g, render_template, redirect, session, flash, request
 from sqlalchemy.exc import IntegrityError
 import requests
@@ -13,10 +13,12 @@ from forms import RegisterUserForm, LoginUserForm, CommentForm, EditUserForm
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = 'bettinggnitteb'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///sports_forum'
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    os.environ.get('DATABASE_URL', 'postgres:///sports_forum'))
+
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 connect_db(app)
 
-db.create_all()
 
 # Global variables
 
@@ -68,13 +70,14 @@ def signup():
     if form.validate_on_submit():
         try:
             user = User.signup(
+                email=form.email.data,
                 username=form.username.data,
                 password=form.password.data
                 )
             db.session.commit()
 
         except IntegrityError:
-            flash("Username already taken", 'danger')
+            flash("Username/Email already taken", 'danger')
             return render_template('signup.html', form=form)
 
         do_login(user)
@@ -120,7 +123,7 @@ def home_page():
     if CURR_USER_KEY in session:
         return redirect('/leagues')
     
-    return redirect('/signup')
+    return redirect('/login')
 
 @app.route('/user/<user_id>')
 def user_details(user_id):
@@ -263,3 +266,9 @@ def remove_like():
     db.session.commit()
     return ({"success":{"removed_like": comment_id}})
 
+# Handle 404 errors
+
+@app.errorhandler(404)
+def page_not_found(e):
+
+    return render_template('404.html', e=e), 404
