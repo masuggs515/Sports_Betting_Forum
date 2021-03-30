@@ -47,7 +47,13 @@ async function deleteComment(e) {
   if (e.target.id == "delete-comment") {
     comment_id = $(e.target).parent().attr('id');
     $(e.target).parent().remove();
-    await axios.delete(`/comment/${comment_id}/delete`)
+    try {
+      await axios.delete(`/comment/${comment_id}/delete`)
+    } catch (error) {
+      console.log(error)
+    }
+    
+
   }
 }
 

@@ -240,7 +240,7 @@ def delete_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
     db.session.delete(comment)
     db.session.commit()
-    return ({"success"})
+    return ({"success": "success"})
 
 
 
